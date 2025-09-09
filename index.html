@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Carta da Sorte</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        /* ===== VARIÁVEIS ===== */
+        :root {
+            --primary-gradient: linear-gradient(135deg, #ffd84a, #ff9d00);
+            --card-front-gradient: linear-gradient(135deg, #f5f5f5, #ddd);
+            --card-back-gradient: linear-gradient(135deg, #fff7d1, #ffe08a);
+            --shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+            --shadow-hover: 0 6px 14px rgba(0, 0, 0, 0.4);
+            --card-shadow: 0 8px 25px rgba(0, 0, 0, 0.4);
+        }
+
+        /* ===== BASE ===== */
+        body {
+            font-family: "Segoe UI", Roboto, sans-serif;
+            background: radial-gradient(circle at center, #1a1a1a, #000);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            color: #fff;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+
+        .container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            max-width: 400px;
+            text-align: center;
+        }
+
+        /* ===== BOTÃO ===== */
+        button {
+            background: var(--primary-gradient);
+            border: none;
+            padding: 16px 28px;
+            border-radius: 12px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+            color: #333;
+            box-shadow: var(--shadow);
+            width: 100%;
+            max-width: 280px;
+            margin-bottom: 35px;
+        }
+
+        button:hover {
+            transform: scale(1.05);
+            box-shadow: var(--shadow-hover);
+        }
+
+        /* ===== CARTA ===== */
+        .card-container {
+            display: flex;
+            justify-content: center;
+            width: 100%;
+            margin-bottom: 20px;
+        }
+
+        .card {
+            perspective: 1000px;
+            width: 100%;
+            max-width: 320px;
+            aspect-ratio: 5/3;
+        }
+
+        .card-inner {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            transition: transform 1s;
+            transform-style: preserve-3d;
+        }
+
+        .card.revealed .card-inner {
+            transform: rotateY(180deg);
+        }
+
+        .card-front,
+        .card-back {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            backface-visibility: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            border-radius: 14px;
+            box-shadow: var(--card-shadow);
+            padding: 20px;
+            box-sizing: border-box;
+        }
+
+        .card-front {
+            background: var(--card-front-gradient);
+            color: #333;
+            font-size: clamp(2rem, 10vw, 3.5rem);
+        }
+
+        .card-back {
+            background: var(--card-back-gradient);
+            transform: rotateY(180deg);
+            font-weight: bold;
+            color: #ff9d00;
+            text-align: center;
+            line-height: 1.4;
+            opacity: 0;
+            font-size: clamp(1rem, 4.5vw, 1.5rem);
+        }
+
+        .card.revealed .card-back {
+            opacity: 1;
+            animation: glowText 1.2s forwards 0.3s;
+        }
+
+        /* ===== ANIMAÇÃO ===== */
+        @keyframes glowText {
+            0% {
+                opacity: 0;
+                transform: scale(0.8);
+                text-shadow: none;
+            }
+
+            70% {
+                opacity: 1;
+                transform: scale(1.1);
+                text-shadow: 0 0 15px #ffdf70, 0 0 30px #ff9d00;
+            }
+
+            100% {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        /* ===== RODAPÉ ===== */
+        footer {
+            margin-top: 30px;
+            font-size: 0.8rem;
+            color: #666;
+        }
+
+        /* ===== RESPONSIVIDADE ===== */
+        @media (max-width: 480px) {
+            button {
+                padding: 14px 24px;
+                font-size: 1rem;
+                max-width: 240px;
+                margin-bottom: 30px;
+            }
+
+            .card {
+                max-width: 280px;
+            }
+        }
+
+        @media (max-width: 350px) {
+            button {
+                max-width: 220px;
+                padding: 12px 20px;
+            }
+
+            .card {
+                max-width: 240px;
+            }
+
+            .card-back {
+                font-size: 0.9rem;
+                padding: 15px;
+            }
+        }
+
+        @media (max-height: 700px) {
+            body {
+                padding: 15px;
+            }
+
+            button {
+                margin-bottom: 25px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <button onclick="revelarCarta()">Tirar Carta da Sorte 🍀</button>
+        <div class="card-container">
+            <div class="card" id="card">
+                <div class="card-inner">
+                    <div class="card-front">❓</div>
+                    <div class="card-back" id="mensagem"></div>
+                </div>
+            </div>
+        </div>
+        <!-- <footer>
+            Site hospedado gratuitamente por 3 dias
+        </footer> -->
+    </div>
+
+    <!-- Sons (substitua com seus próprios arquivos ou links) -->
+    <audio id="soundFlip" preload="auto">
+        <source src="https://assets.mixkit.co/sfx/preview/mixkit-card-flip-914.mp3" type="audio/mpeg">
+    </audio>
+    <audio id="soundShine" preload="auto">
+        <source src="https://assets.mixkit.co/sfx/preview/mixkit-magic-sparkle-3021.mp3" type="audio/mpeg">
+    </audio>
+
+    <script>
+        const frases = [
+            "Grandes mudanças estão a caminho!",
+            "A sorte sorrirá para você em breve.",
+            "Um desafio superado trará recompensas.",
+            "Oportunidades virão de onde menos espera.",
+            "Um novo amigo mudará seu destino.",
+            "Seu talento será reconhecido hoje.",
+            "Aproveite o momento presente.",
+            "Sua criatividade trará soluções inovadoras.",
+            "Momentos de alegria estão por vir.",
+            "Siga sua intuição - ela não irá te enganar."
+        ];
+
+        function revelarCarta() {
+            const sorteada = frases[Math.floor(Math.random() * frases.length)];
+            const card = document.getElementById('card');
+            const mensagem = document.getElementById('mensagem');
+            const flipSound = document.getElementById('soundFlip');
+            const shineSound = document.getElementById('soundShine');
+
+            // reset
+            card.classList.remove('revealed');
+            mensagem.style.animation = 'none';
+            void mensagem.offsetWidth; // força reflow para resetar animação
+
+            mensagem.textContent = sorteada;
+
+            // som flip
+            flipSound.currentTime = 0;
+            flipSound.play();
+
+            setTimeout(() => {
+                card.classList.add('revealed');
+
+                // som shine
+                setTimeout(() => {
+                    shineSound.currentTime = 0;
+                    shineSound.play();
+                }, 400);
+            }, 100);
+        }
+    </script>
+</body>
+
+</html>
